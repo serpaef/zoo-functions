@@ -63,12 +63,10 @@ function countAnimals(species) {
       obj[specie] = animal.residents.length;
       return obj;
     });
-    counter = counter.reduce((acc, curr) => {
-      return {
-        ...acc,
-        ...curr,
-      };
-    }, {});
+    counter = counter.reduce((acc, curr) => ({
+      ...acc,
+      ...curr,
+    }), {});
     return counter;
   }
   const specie = data.species.find((item) => item.name === species);
