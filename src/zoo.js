@@ -41,6 +41,10 @@ function createEmployee({ id, firstName, lastName }, { managers, responsibleFor 
 
 function isManager(id) {
   // seu código aqui
+  const reducer = (acc, curr) => [...acc, ...curr];
+  let managers = data.employees.map((employee) => employee.managers);
+  managers = managers.reduce(reducer, []);
+  return managers.some((mId) => mId === id);
 }
 
 function addEmployee(id, firstName, lastName, managers, responsibleFor) {
