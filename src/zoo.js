@@ -28,8 +28,15 @@ function getEmployeeByName(employeeName) {
   return employee;
 }
 
-function createEmployee(personalInfo, associatedWith) {
+function createEmployee({ id, firstName, lastName }, { managers, responsibleFor }) {
   // seu código aqui
+  return {
+    id,
+    firstName,
+    lastName,
+    managers,
+    responsibleFor,
+  };
 }
 
 function isManager(id) {
