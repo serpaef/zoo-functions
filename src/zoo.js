@@ -242,11 +242,40 @@ function increasePrices(percentage) {
   data.prices.Child = parseFloat(child.toFixed(2));
 }
 
+function getCoverage(idOrName) {
+  const { employees } = data;
+  const employee = employees.find((emp) => {
+    if (emp.firstName === idOrName
+      || emp.lastName === idOrName
+      || emp.id === idOrName) {
+      return true;
+    }
+    return false;
+  });
+  let species = getSpeciesByIds(...employee.responsibleFor);
+  species = species.map((specie) => specie.name);
+  const coverage = {};
+  coverage[`${employee.firstName} ${employee.lastName}`] = species;
+  return coverage;
+}
+
 function getEmployeeCoverage(idOrName) {
   // seu código aqui
+  if (!idOrName) {
+    const { employees } = data;
+    let coverageList = [];
+    employees.forEach((employee) => {
+      coverageList.push(getCoverage(employee.id));
+    });
+    const reducer = (acc, curr) => ({ ...acc, ...curr });
+    coverageList = coverageList.reduce(reducer, {});
+    return coverageList;
+  }
+  return getCoverage(idOrName);
 }
 
 module.exports = {
+  getCoverage,
   orderSexObj,
   returnSexFiltered,
   getAnimalsByLocation,
