@@ -81,8 +81,122 @@ function calculateEntry({ Adult = 0, Child = 0, Senior = 0 } = 0) {
   return adult + child + senior;
 }
 
-function getAnimalMap(options) {
+function returnAnimalsByLocation() {
+  const seAnimals = data.species.filter((animal) => animal.location === 'SE');
+  const nwAnimals = data.species.filter((animal) => animal.location === 'NW');
+  const swAnimals = data.species.filter((animal) => animal.location === 'SW');
+  const neAnimals = data.species.filter((animal) => animal.location === 'NE');
+
+  const animals = {
+    NE: neAnimals.map((animal) => animal.name),
+    NW: nwAnimals.map((animal) => animal.name),
+    SE: seAnimals.map((animal) => animal.name),
+    SW: swAnimals.map((animal) => animal.name),
+  };
+
+  return animals;
+}
+
+// obtem objeto de animais por localização
+function getAnimalsByLocation(location) {
+  const species = data.species.filter((animal) => animal.location === location);
+  return species;
+}
+
+// retorna objeto ordenado
+function orderObj(list) {
+  const orderedList = [];
+  list.forEach((animal) => {
+    const specie = animal.name;
+    const obj = {};
+    obj[specie] = animal.residents.map((resident) => resident.name);
+    obj[specie] = obj[specie].sort();
+    orderedList.push(obj);
+  });
+  return orderedList;
+}
+// mais uma né
+function orderSexObj(animals, sex) {
+  const list = [];
+  animals.forEach((animal) => {
+    let animalList = animal.residents;
+    const specie = animal.name;
+    animalList = animalList.filter((item) => item.sex === sex);
+    const obj = {};
+    obj[specie] = animalList.map((resident) => resident.name);
+    obj[specie] = obj[specie].sort();
+    list.push(obj);
+  });
+  return list;
+}
+
+// pega uma lista de animais e transforma em um objeto
+function getMembersList(animals, sorted, sex) {
+  if (sorted && sex) { return orderSexObj(animals, sex); }
+  if (sorted) {
+    return orderObj(animals);
+  }
+  const list = [];
+  animals.forEach((animal) => {
+    let animalList = animal.residents;
+    const specie = animal.name;
+    if (sex) { animalList = animalList.filter((item) => item.sex === sex); }
+    const obj = {};
+    obj[specie] = animalList.map((resident) => resident.name);
+    list.push(obj);
+  });
+  return list;
+}
+
+// retorna a lista mapeada ordenada
+function returnMapOrdered(includeNames) {
+  const nwAnimals = getMembersList(getAnimalsByLocation('NW'), true);
+  const neAnimals = getMembersList(getAnimalsByLocation('NE'), true);
+  const seAnimals = getMembersList(getAnimalsByLocation('SE'), true);
+  const swAnimals = getMembersList(getAnimalsByLocation('SW'), true);
+  const animals = { NW: nwAnimals, NE: neAnimals, SE: seAnimals, SW: swAnimals };
+  return animals;
+}
+
+// retorna a lista filtrada por sexo
+function returnSexFiltered(sex) {
+  const nwAnimals = getMembersList(getAnimalsByLocation('NW'), undefined, sex);
+  const neAnimals = getMembersList(getAnimalsByLocation('NE'), undefined, sex);
+  const seAnimals = getMembersList(getAnimalsByLocation('SE'), undefined, sex);
+  const swAnimals = getMembersList(getAnimalsByLocation('SW'), undefined, sex);
+  const animals = { NW: nwAnimals, NE: neAnimals, SE: seAnimals, SW: swAnimals };
+  return animals;
+}
+
+// retorna a lista ordenada e filtrada por sexo
+function returnSexOrdered(sex) {
+  const nwAnimals = getMembersList(getAnimalsByLocation('NW'), true, sex);
+  const neAnimals = getMembersList(getAnimalsByLocation('NE'), true, sex);
+  const seAnimals = getMembersList(getAnimalsByLocation('SE'), true, sex);
+  const swAnimals = getMembersList(getAnimalsByLocation('SW'), true, sex);
+  const animals = { NW: nwAnimals, NE: neAnimals, SE: seAnimals, SW: swAnimals };
+  console.log(animals);
+  return animals;
+}
+
+// retorna a lista de membros
+function returnMembersList(sorted, sex) {
+  if (sorted && sex) { return returnSexOrdered(sex); }
+  if (sorted) { return returnMapOrdered(); }
+  if (sex) { return returnSexFiltered(sex); }
+  const nwAnimals = getMembersList(getAnimalsByLocation('NW'));
+  const neAnimals = getMembersList(getAnimalsByLocation('NE'));
+  const seAnimals = getMembersList(getAnimalsByLocation('SE'));
+  const swAnimals = getMembersList(getAnimalsByLocation('SW'));
+  const animals = { NW: nwAnimals, NE: neAnimals, SE: seAnimals, SW: swAnimals };
+  return animals;
+}
+
+function getAnimalMap(obj) {
   // seu código aqui
+  if (!obj) { return returnAnimalsByLocation(); }
+  if (obj.includeNames !== true) { return returnAnimalsByLocation(); }
+  return returnMembersList(obj.sorted, obj.sex);
 }
 
 function getSchedule(dayName) {
@@ -102,6 +216,12 @@ function getEmployeeCoverage(idOrName) {
 }
 
 module.exports = {
+  orderSexObj,
+  returnSexFiltered,
+  getAnimalsByLocation,
+  returnAnimalsByLocation,
+  getMembersList,
+  returnMembersList,
   calculateEntry,
   getSchedule,
   countAnimals,
